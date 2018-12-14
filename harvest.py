@@ -65,7 +65,7 @@ class OAIRequest:
                     has_title = self.__check_for_title(record_as_json)
                     has_rights = self.__check_for_rights(record_as_json)
                     has_url = self.__check_identifiers(record_as_json)
-                    print(has_url)
+                    print(has_rights)
                     if has_rights is True and has_title is True and has_url is True:
                         self.__write_to_disk(record_as_xml, filename)
         return
@@ -79,8 +79,12 @@ class OAIRequest:
 
     def __check_for_rights(self, document):
         try:
-            if document[self.metadata_key]["dc:rights"]:
-                return True
+            for k, v in document[self.metadata_key].items():
+                if k == "dc:rights":
+                    return True
+                elif k == "dcterms:accessRights":
+                    return True
+            return False
         except KeyError:
             return False
 
