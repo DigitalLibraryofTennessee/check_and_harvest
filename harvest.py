@@ -5,7 +5,7 @@ import xmltodict
 
 
 class OAIRequest:
-    def __init__(self, endpoint, oai_set="nr", prefix="oai_dc"):
+    def __init__(self, endpoint, oai_set="", prefix="oai_dc"):
         self.oai_base = endpoint
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
         self.token = ""
@@ -27,6 +27,12 @@ class OAIRequest:
         if our_set != "":
             endpoint = f"{endpoint}&set={our_set}"
         return endpoint
+
+    def __get_root_tag_and_namespace(self):
+        if self.metadata_prefix == "oai_dc":
+            return './/{http://www.openarchives.org/OAI/2.0/oai_dc/}dc'
+        elif self.metadata_prefix == "oai_qdc":
+            return './/{http://worldcat.org/xmlschemas/qdc-1.0/}qualifieddc'
 
     def process_token(self, token):
         if len(token) == 1:
@@ -51,7 +57,7 @@ class OAIRequest:
         for record in all_metadata:
             filename = xmltodict.parse(etree.tostring(record))["record"]["header"]["identifier"]
             metadata = etree.fromstring(etree.tostring(record).decode("utf-8"))
-            record = metadata.findall('.//{http://www.openarchives.org/OAI/2.0/oai_dc/}dc')
+            record = metadata.findall(self.__get_root_tag_and_namespace())
             if len(record) != 0:
                 for rec in record:
                     record_as_xml = etree.tostring(rec)
@@ -59,30 +65,27 @@ class OAIRequest:
                     has_title = self.__check_for_title(record_as_json)
                     has_rights = self.__check_for_rights(record_as_json)
                     has_url = self.__check_identifiers(record_as_json)
-                    print(f"{has_url} {has_title} {has_rights}")
+                    print(has_url)
                     if has_rights is True and has_title is True and has_url is True:
                         self.__write_to_disk(record_as_xml, filename)
         return
 
-    @staticmethod
-    def __check_for_title(document):
+    def __check_for_title(self, document):
         try:
-            if document["oai_dc:dc"]["dc:title"]:
+            if document[self.metadata_key]["dc:title"]:
                 return True
         except KeyError:
             return False
 
-    @staticmethod
-    def __check_for_rights(document):
+    def __check_for_rights(self, document):
         try:
-            if document["oai_dc:dc"]["dc:rights"]:
+            if document[self.metadata_key]["dc:rights"]:
                 return True
         except KeyError:
             return False
 
-    @staticmethod
-    def __check_identifiers(document):
-        identifiers = document["oai_dc:dc"]["dc:identifier"]
+    def __check_identifiers(self, document):
+        identifiers = document[self.metadata_key]["dc:identifier"]
         try:
             if type(identifiers) is str:
                 if identifiers.startswith("http"):
@@ -109,4 +112,4 @@ class OAIRequest:
 
 
 if __name__ == "__main__":
-    OAIRequest("http://digi.countrymusichalloffame.org/oai/oai.php", "musicaudio").list_records()
+    OAIRequest("http://digi.countrymusichalloffame.org/oai/oai.php", "musicaudio", "oai_qdc").list_records()
