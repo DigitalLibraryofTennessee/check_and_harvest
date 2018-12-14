@@ -51,7 +51,7 @@ class OAIRequest:
         for record in all_metadata:
             filename = xmltodict.parse(etree.tostring(record))["record"]["header"]["identifier"]
             metadata = etree.fromstring(etree.tostring(record).decode("utf-8"))
-            record = metadata.findall('.//{http://www.openarchives.org/OAI/2.0/}metadata')
+            record = metadata.findall('.//{http://www.openarchives.org/OAI/2.0/oai_dc/}dc')
             if len(record) != 0:
                 for rec in record:
                     record_as_xml = etree.tostring(rec)
@@ -59,6 +59,7 @@ class OAIRequest:
                     has_title = self.__check_for_title(record_as_json)
                     has_rights = self.__check_for_rights(record_as_json)
                     has_url = self.__check_identifiers(record_as_json)
+                    print(f"{has_url} {has_title} {has_rights}")
                     if has_rights is True and has_title is True and has_url is True:
                         self.__write_to_disk(record_as_xml, filename)
         return
@@ -66,7 +67,7 @@ class OAIRequest:
     @staticmethod
     def __check_for_title(document):
         try:
-            if document["metadata"]["oai_dc:dc"]["dc:title"]:
+            if document["oai_dc:dc"]["dc:title"]:
                 return True
         except KeyError:
             return False
@@ -74,14 +75,14 @@ class OAIRequest:
     @staticmethod
     def __check_for_rights(document):
         try:
-            if document["metadata"]["oai_dc:dc"]["dc:rights"]:
+            if document["oai_dc:dc"]["dc:rights"]:
                 return True
         except KeyError:
             return False
 
     @staticmethod
     def __check_identifiers(document):
-        identifiers = document["metadata"]["oai_dc:dc"]["dc:identifier"]
+        identifiers = document["oai_dc:dc"]["dc:identifier"]
         try:
             if type(identifiers) is str:
                 if identifiers.startswith("http"):
@@ -108,4 +109,4 @@ class OAIRequest:
 
 
 if __name__ == "__main__":
-    OAIRequest("http://dpla.lib.utk.edu/repox/OAIHandler", "p15769coll18").list_records()
+    OAIRequest("http://digi.countrymusichalloffame.org/oai/oai.php", "musicaudio").list_records()
