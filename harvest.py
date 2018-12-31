@@ -115,4 +115,4 @@ class OAIRequest:
 
 
 if __name__ == "__main__":
-    OAIRequest("http://digi.countrymusichalloffame.org/oai/oai.php", "musicaudio", "oai_qdc").list_records()
+    OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "p15769coll19", "oai_qdc").list_records()
