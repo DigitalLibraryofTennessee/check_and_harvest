@@ -20,6 +20,8 @@ class OAIRequest:
             return "oai_dc:dc"
         elif metadata_format == "oai_qdc":
             return "oai_qdc:qualifieddc"
+        elif metadata_format == "xoai":
+            return "xoai"
 
     @staticmethod
     def set_endpoint(our_endpoint, our_set, our_prefix):
@@ -62,49 +64,11 @@ class OAIRequest:
                 for rec in record:
                     record_as_xml = etree.tostring(rec)
                     record_as_json = json.loads(json.dumps(xmltodict.parse(record_as_xml)))
-                    has_title = self.__check_for_title(record_as_json)
-                    has_rights = self.__check_for_rights(record_as_json)
-                    has_url = self.__check_identifiers(record_as_json)
-                    if has_rights is True and has_title is True and has_url is True:
-                        self.__write_to_disk(record_as_xml, filename)
+                    if self.metadata_key != "xoai":
+                        dc_record = DCTester(self.metadata_key, record_as_json)
+                        if dc_record.is_good is True:
+                            self.__write_to_disk(record_as_xml, filename)
         return
-
-    def __check_for_title(self, document):
-        try:
-            if document[self.metadata_key]["dc:title"]:
-                return True
-        except KeyError:
-            return False
-
-    def __check_for_rights(self, document):
-        try:
-            for k, v in document[self.metadata_key].items():
-                if k == "dc:rights":
-                    return True
-                elif k == "dcterms:accessRights":
-                    return True
-            return False
-        except KeyError:
-            return False
-
-    def __check_identifiers(self, document):
-        identifiers = document[self.metadata_key]["dc:identifier"]
-        try:
-            if type(identifiers) is str:
-                if identifiers.startswith("http"):
-                    return True
-                else:
-                    return False
-            elif type(identifiers) is list:
-                good = False
-                for id in identifiers:
-                    if id.startswith("http"):
-                        good = True
-                return good
-            else:
-                return False
-        except KeyError:
-            return False
 
     @staticmethod
     def __write_to_disk(document, name):
@@ -114,5 +78,58 @@ class OAIRequest:
         return
 
 
+class DCTester:
+    def __init__(self, metadata_format, document):
+        self.metadata_key = metadata_format
+        self.document = document
+        self.is_good = self.__test()
+
+    def __test(self):
+        has_title = self.__check_for_title()
+        has_rights = self.__check_for_rights()
+        has_thumbs = self.__check_identifiers()
+        if has_rights is True and has_thumbs is True and has_title is True:
+            return True
+        else:
+            return False
+
+    def __check_for_title(self):
+        try:
+            if self.document[self.metadata_key]["dc:title"]:
+                return True
+        except KeyError:
+            return False
+
+    def __check_for_rights(self):
+        try:
+            for k, v in self.document[self.metadata_key].items():
+                if k == "dc:rights":
+                    return True
+                elif k == "dcterms:accessRights":
+                    return True
+            return False
+        except KeyError:
+            return False
+
+    def __check_identifiers(self):
+        identifiers = self.document[self.metadata_key]["dc:identifier"]
+        try:
+            if type(identifiers) is str:
+                if identifiers.startswith("http"):
+                    return True
+                else:
+                    return False
+            elif type(identifiers) is list:
+                good = False
+                for identifier in identifiers:
+                    if identifier.startswith("http"):
+                        good = True
+                return good
+            else:
+                return False
+        except KeyError:
+            return False
+
+
 if __name__ == "__main__":
-    OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "p15769coll19", "oai_qdc").list_records()
+    x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
