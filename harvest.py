@@ -13,6 +13,7 @@ class OAIRequest:
         self.metadata_key = self.__set_metadata_key(prefix)
         self.status = "In Progress"
         self.set = oai_set
+        self.bad_records = 0
 
     @staticmethod
     def __set_metadata_key(metadata_format):
@@ -70,10 +71,14 @@ class OAIRequest:
                         dc_record = DCTester(self.metadata_key, record_as_json)
                         if dc_record.is_good is True:
                             self.__write_to_disk(record_as_xml, filename)
+                        else:
+                            self.bad_records += 1
                     else:
                         xoai_record = XOAITester(record_as_json)
                         if xoai_record.is_good is True:
                             self.__write_to_disk(record_as_xml, filename)
+                        else:
+                            self.bad_records += 1
         return
 
     @staticmethod
@@ -151,15 +156,20 @@ class XOAITester:
 
     def __check_thumbnails(self):
         has_thumbnail = False
-        for bundle in self.document['metadata']['element'][1]['element']:
-            try:
-                if bundle['field']['#text'] == 'THUMBNAIL':
-                    has_thumbnail = True
-            except TypeError:
-                pass
+        try:
+            for bundle in self.document['metadata']['element'][1]['element']:
+                try:
+                    if bundle['field']['#text'] == 'THUMBNAIL':
+                        has_thumbnail = True
+                except TypeError:
+                    pass
+        except KeyError:
+            pass
         return has_thumbnail
 
 
 if __name__ == "__main__":
     #x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
-    x = OAIRequest("http://dlynx.rhodes.edu:8080/oai/request", "col_10267_11338", "xoai").list_records()
+    x = OAIRequest("http://dlynx.rhodes.edu:8080/oai/request", "col_10267_34285", "xoai")
+    x.list_records()
+    print(f'Set currently has {x.bad_records} bad records.')
