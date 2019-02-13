@@ -35,6 +35,8 @@ class OAIRequest:
             return './/{http://www.openarchives.org/OAI/2.0/oai_dc/}dc'
         elif self.metadata_prefix == "oai_qdc":
             return './/{http://worldcat.org/xmlschemas/qdc-1.0/}qualifieddc'
+        elif self.metadata_prefix == "xoai":
+            return './/{http://www.lyncode.com/xoai}metadata'
 
     def process_token(self, token):
         if len(token) == 1:
@@ -67,6 +69,10 @@ class OAIRequest:
                     if self.metadata_key != "xoai":
                         dc_record = DCTester(self.metadata_key, record_as_json)
                         if dc_record.is_good is True:
+                            self.__write_to_disk(record_as_xml, filename)
+                    else:
+                        xoai_record = XOAITester(record_as_json)
+                        if xoai_record.is_good is True:
                             self.__write_to_disk(record_as_xml, filename)
         return
 
@@ -131,5 +137,29 @@ class DCTester:
             return False
 
 
+class XOAITester:
+    def __init__(self, document):
+        self.document = document
+        self.is_good = self.test()
+
+    def test(self):
+        has_thumbnails = self.__check_thumbnails()
+        return has_thumbnails
+
+    def __check_titles(self):
+        return
+
+    def __check_thumbnails(self):
+        has_thumbnail = False
+        for bundle in self.document['metadata']['element'][1]['element']:
+            try:
+                if bundle['field']['#text'] == 'THUMBNAIL':
+                    has_thumbnail = True
+            except TypeError:
+                pass
+        return has_thumbnail
+
+
 if __name__ == "__main__":
-    x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
+    #x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
+    x = OAIRequest("http://dlynx.rhodes.edu:8080/oai/request", "col_10267_11338", "xoai").list_records()
