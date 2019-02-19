@@ -79,6 +79,7 @@ class OAIRequest:
                             self.__write_to_disk(record_as_xml, filename)
                         else:
                             self.bad_records += 1
+                            self.__write_bad_records_to_log(record_as_json)
         return
 
     @staticmethod
@@ -86,6 +87,12 @@ class OAIRequest:
         filename = name.split(":")[-1].replace("/", "_")
         with open(f"output/{filename}.xml", "w") as xml_file:
             xml_file.write(document.decode("utf-8"))
+        return
+
+    @staticmethod
+    def __write_bad_records_to_log(bad_record):
+        with open("bad_records.log", 'a+') as bad_records:
+            bad_records.write(f'This is a bad record:\n  {bad_record}\n')
         return
 
 
