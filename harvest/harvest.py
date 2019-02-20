@@ -5,8 +5,9 @@ import xmltodict
 
 
 class OAIRequest:
-    def __init__(self, endpoint, oai_set="", prefix="oai_dc"):
+    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True):
         self.oai_base = endpoint
+        self.harvest = harvest
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
         self.token = ""
         self.metadata_prefix = prefix
@@ -242,13 +243,16 @@ class MODSTester:
 
     def __check_rights(self):
         has_rights = False
-        if 'accessCondition' in self.document['mods']:
-            access_condition = self.document['mods']['accessCondition']
-            if '@type' in access_condition:
-                if access_condition['type'] == 'use and reproduction' and '@xlink:href' in access_condition:
-                    has_rights = True
-                elif access_condition['type'] == 'local':
-                    has_rights = True
+        try:
+            if 'accessCondition' in self.document['mods']:
+                access_condition = self.document['mods']['accessCondition']
+                if '@type' in access_condition:
+                    if access_condition['type'] == 'use and reproduction' and '@xlink:href' in access_condition:
+                        has_rights = True
+                    elif access_condition['type'] == 'local':
+                        has_rights = True
+        except KeyError:
+            pass
         return has_rights
 
     def __check_thumbnails(self):
