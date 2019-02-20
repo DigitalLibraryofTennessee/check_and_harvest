@@ -23,6 +23,8 @@ class OAIRequest:
             return "oai_qdc:qualifieddc"
         elif metadata_format == "xoai":
             return "xoai"
+        elif metadata_format == "MODS" or metadata_format == "mods":
+            return "mods"
 
     @staticmethod
     def set_endpoint(our_endpoint, our_set, our_prefix):
@@ -38,6 +40,8 @@ class OAIRequest:
             return './/{http://worldcat.org/xmlschemas/qdc-1.0/}qualifieddc'
         elif self.metadata_prefix == "xoai":
             return './/{http://www.lyncode.com/xoai}metadata'
+        elif self.metadata_prefix == 'mods' or self.metadata_prefix == 'MODS':
+            return './/{http://www.loc.gov/mods/v3}mods'
 
     def process_token(self, token):
         if len(token) == 1:
@@ -67,15 +71,23 @@ class OAIRequest:
                 for rec in record:
                     record_as_xml = etree.tostring(rec)
                     record_as_json = json.loads(json.dumps(xmltodict.parse(record_as_xml)))
-                    if self.metadata_key != "xoai":
+                    if self.metadata_key == "oai_dc:dc":
                         dc_record = DCTester(self.metadata_key, record_as_json)
                         if dc_record.is_good is True:
                             self.__write_to_disk(record_as_xml, filename)
                         else:
                             self.bad_records += 1
-                    else:
+                            self.__write_bad_records_to_log(record_as_json)
+                    elif self.metadata_key == "xoai":
                         xoai_record = XOAITester(record_as_json)
                         if xoai_record.is_good is True:
+                            self.__write_to_disk(record_as_xml, filename)
+                        else:
+                            self.bad_records += 1
+                            self.__write_bad_records_to_log(record_as_json)
+                    elif self.metadata_key == "mods":
+                        mods_record = MODSTester(record_as_json)
+                        if mods_record.is_good is True:
                             self.__write_to_disk(record_as_xml, filename)
                         else:
                             self.bad_records += 1
@@ -152,9 +164,9 @@ class DCTester:
 class XOAITester:
     def __init__(self, document):
         self.document = document
-        self.is_good = self.test()
+        self.is_good = self.__test()
 
-    def test(self):
+    def __test(self):
         has_thumbnails = self.__check_thumbnails()
         return has_thumbnails
 
@@ -173,6 +185,95 @@ class XOAITester:
         except KeyError:
             pass
         return has_thumbnail
+
+
+class MODSTester:
+    def __init__(self, document):
+        self.document = document
+        self.is_good = self.__test()
+
+    def __test(self):
+        checks = [
+            self.__check_for_title(),
+            self.__check_record_content_source(),
+            self.__check_rights(),
+            self.__check_thumbnails(),
+            self.__check_object_in_context()
+        ]
+        if False in checks:
+            return False
+        else:
+            return True
+
+    def __check_for_title(self):
+        has_title = False
+        title_info = self.document['mods']['titleInfo']
+        try:
+            if type(title_info) is list:
+                for title in title_info:
+                    if "@type" in title:
+                        if title['@type'] != "alternative":
+                            has_title = True
+                    elif "#text" in title:
+                        has_title = True
+                    elif type(title) is str:
+                        has_title = True
+            elif type(title_info) is dict:
+                if "@type" in title_info['title']:
+                    if title_info['title']['@type'] != "alternative":
+                        has_title = True
+                elif type(title_info['title']) is str:
+                    has_title = True
+        except KeyError:
+            pass
+        return has_title
+
+    def __check_record_content_source(self):
+        has_record_content_source = False
+        try:
+            record_info = self.document['mods']['recordInfo']
+            if 'recordContentSource' in record_info:
+                has_record_content_source = True
+            else:
+                print(record_info)
+        except KeyError:
+            print(self.document)
+        return has_record_content_source
+
+    def __check_rights(self):
+        has_rights = False
+        if 'accessCondition' in self.document['mods']:
+            access_condition = self.document['mods']['accessCondition']
+            if '@type' in access_condition:
+                if access_condition['type'] == 'use and reproduction' and '@xlink:href' in access_condition:
+                    has_rights = True
+                elif access_condition['type'] == 'local':
+                    has_rights = True
+        return has_rights
+
+    def __check_thumbnails(self):
+        has_a_thumbnail = False
+        location = self.document['mods']['location']
+        try:
+            if 'url' in location:
+                for url in location['url']:
+                    if url['@access'] == "preview":
+                        has_a_thumbnail = True
+        except KeyError:
+            pass
+        return has_a_thumbnail
+
+    def __check_object_in_context(self):
+        has_object_in_context = False
+        location = self.document['mods']['location']
+        try:
+            if 'url' in location:
+                for url in location['url']:
+                    if url['@access'] == "object in context":
+                        has_object_in_context = True
+        except KeyError:
+            pass
+        return has_object_in_context
 
 
 if __name__ == "__main__":
