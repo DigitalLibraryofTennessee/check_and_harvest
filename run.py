@@ -3,13 +3,13 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download good OAI records only.")
+    parser = argparse.ArgumentParser(description="Check and Harvest if OAI records meet our requirements.")
     parser.add_argument(
         "-s",
         "--set",
         dest="oai_set",
         help="Specify your oai endpoint.",
-        required=True
+        required=False
     )
     parser.add_argument(
         "-e",
@@ -25,9 +25,23 @@ def main():
         help="Specify your metadata formant",
         required=True
     )
+    parser.add_argument(
+        '-H',
+        '--harvest_records',
+        dest='harvest_records',
+        help="Specify whether to harvest files or not. Defaults to True",
+        required=False,
+        default="True"
+    )
 
     args = parser.parse_args()
-    request = OAIRequest(args.oai_endpoint, args.oai_set, args.metadata_format)
+    harvest_records = True
+    oai_set = ""
+    if args.harvest_records.lower() == "false":
+        harvest_records = False
+    if args.oai_set:
+        oai_set = args.oai_set
+    request = OAIRequest(args.oai_endpoint, oai_set, args.metadata_format, harvest_records)
     request.list_records()
     print(f'This set currently has {request.bad_records} bad records.')
     return
