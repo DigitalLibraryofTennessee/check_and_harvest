@@ -199,7 +199,7 @@ class MODSTester:
             self.__check_record_content_source(),
             self.__check_rights(),
             self.__check_thumbnails(),
-            self.__check_object_in_context()
+            self.__check_object_in_context(),
         ]
         if False in checks:
             return False
@@ -235,10 +235,8 @@ class MODSTester:
             record_info = self.document['mods']['recordInfo']
             if 'recordContentSource' in record_info:
                 has_record_content_source = True
-            else:
-                print(record_info)
         except KeyError:
-            print(self.document)
+            pass
         return has_record_content_source
 
     def __check_rights(self):
@@ -247,9 +245,9 @@ class MODSTester:
             if 'accessCondition' in self.document['mods']:
                 access_condition = self.document['mods']['accessCondition']
                 if '@type' in access_condition:
-                    if access_condition['type'] == 'use and reproduction' and '@xlink:href' in access_condition:
+                    if access_condition['@type'] == 'use and reproduction' and '@xlink:href' in access_condition:
                         has_rights = True
-                    elif access_condition['type'] == 'local':
+                    elif access_condition['@type'] == 'local rights statement':
                         has_rights = True
         except KeyError:
             pass
