@@ -161,10 +161,28 @@ class XOAITester:
         self.is_good = self.__test()
 
     def __test(self):
-        has_thumbnails = self.__check_thumbnails()
-        return has_thumbnails
+        checks = [
+            self.__check_thumbnails(),
+            self.__check_titles
+        ]
+        if False in checks:
+            return False
+        else:
+            return True
 
     def __check_titles(self):
+        has_a_title = False
+        try:
+            for element in self.document['metadata']:
+                if element['@name'] == "DC":
+                    for dc_path in element:
+                        if dc_path['@name'] == 'title':
+                            has_a_title = True
+        except KeyError:
+            pass
+        return has_a_title
+
+    def __check_handle(self):
         return
 
     def __check_thumbnails(self):
@@ -254,8 +272,8 @@ class MODSTester:
                 for url in location['url']:
                     if url['@access'] == "preview":
                         has_a_thumbnail = True
-        except KeyError as my_exception:
-            print(my_exception)
+        except KeyError:
+            pass
         except TypeError:
             pass
         return has_a_thumbnail
