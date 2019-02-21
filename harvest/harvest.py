@@ -265,6 +265,13 @@ class MODSTester:
                         has_rights = True
                     elif access_condition['@type'] == 'local rights statement':
                         has_rights = True
+                elif type(access_condition) is list:
+                    for rights in access_condition:
+                        if '@type' in rights:
+                            if rights['@type'] == 'use and reproduction' and '@xlink:href' in rights:
+                                has_rights = True
+                            elif rights['@type'] == 'local rights statement':
+                                has_rights = True
         except KeyError:
             pass
         return has_rights
