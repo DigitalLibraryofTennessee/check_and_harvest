@@ -18,14 +18,14 @@ class OAIRequest:
 
     @staticmethod
     def __set_metadata_key(metadata_format):
-        if metadata_format == "oai_dc":
-            return "oai_dc:dc"
-        elif metadata_format == "oai_qdc":
-            return "oai_qdc:qualifieddc"
-        elif metadata_format == "xoai":
-            return "xoai"
-        elif metadata_format == "MODS" or metadata_format == "mods":
-            return "mods"
+        metadata_keys = {
+            'oai_dc': 'oai_dc:dc',
+            'oai_qdc': 'oai_qdc:qualifieddc',
+            'xoai': 'xoai',
+            'mods': 'mods',
+            'MODS': 'mods',
+        }
+        return metadata_keys[metadata_format]
 
     @staticmethod
     def set_endpoint(our_endpoint, our_set, our_prefix):
@@ -35,22 +35,21 @@ class OAIRequest:
         return endpoint
 
     def __get_root_tag_and_namespace(self):
-        if self.metadata_prefix == "oai_dc":
-            return './/{http://www.openarchives.org/OAI/2.0/oai_dc/}dc'
-        elif self.metadata_prefix == "oai_qdc":
-            return './/{http://worldcat.org/xmlschemas/qdc-1.0/}qualifieddc'
-        elif self.metadata_prefix == "xoai":
-            return './/{http://www.lyncode.com/xoai}metadata'
-        elif self.metadata_prefix == 'mods' or self.metadata_prefix == 'MODS':
-            return './/{http://www.loc.gov/mods/v3}mods'
+        root_tag = {
+            'oai_dc': './/{http://www.openarchives.org/OAI/2.0/oai_dc/}dc',
+            'oai_qdc': './/{http://worldcat.org/xmlschemas/qdc-1.0/}qualifieddc',
+            'xoai': './/{http://www.lyncode.com/xoai}metadata',
+            'mods': './/{http://www.loc.gov/mods/v3}mods',
+            'MODS': './/{http://www.loc.gov/mods/v3}mods',
+        }
+        return root_tag[self.metadata_prefix]
 
     def process_token(self, token):
         if len(token) == 1:
             self.token = f'&resumptionToken={token[0].text}'
-            return
         else:
             self.status = "Done"
-            return
+        return
 
     def list_records(self):
         r = requests.get(f"{self.endpoint}")
@@ -109,13 +108,15 @@ class DCTester:
         self.is_good = self.__test()
 
     def __test(self):
-        has_title = self.__check_for_title()
-        has_rights = self.__check_for_rights()
-        has_thumbs = self.__check_identifiers()
-        if has_rights is True and has_thumbs is True and has_title is True:
-            return True
-        else:
+        tests = [
+            self.__check_for_title(),
+            self.__check_for_rights(),
+            self.__check_identifiers(),
+        ]
+        if False in tests:
             return False
+        else:
+            return True
 
     def __check_for_title(self):
         try:
