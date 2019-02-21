@@ -72,28 +72,21 @@ class OAIRequest:
                 for rec in record:
                     record_as_xml = etree.tostring(rec)
                     record_as_json = json.loads(json.dumps(xmltodict.parse(record_as_xml)))
-                    if self.metadata_key == "oai_dc:dc":
-                        dc_record = DCTester(self.metadata_key, record_as_json)
-                        if dc_record.is_good is True:
-                            self.__write_to_disk(record_as_xml, filename)
-                        else:
-                            self.bad_records += 1
-                            self.__write_bad_records_to_log(record_as_json)
-                    elif self.metadata_key == "xoai":
-                        xoai_record = XOAITester(record_as_json)
-                        if xoai_record.is_good is True:
-                            self.__write_to_disk(record_as_xml, filename)
-                        else:
-                            self.bad_records += 1
-                            self.__write_bad_records_to_log(record_as_json)
-                    elif self.metadata_key == "mods":
-                        mods_record = MODSTester(record_as_json)
-                        if mods_record.is_good is True:
-                            self.__write_to_disk(record_as_xml, filename)
-                        else:
-                            self.bad_records += 1
-                            self.__write_bad_records_to_log(record_as_json)
+                    record_test = self.__record_test(record_as_json)
+                    if record_test.is_good is True and self.harvest is True:
+                        self.__write_to_disk(record_as_xml, filename)
+                    elif record_test.is_good is False:
+                        self.bad_records += 1
+                        self.__write_bad_records_to_log(record_as_json)
         return
+
+    def __record_test(self, some_json):
+        if self.metadata_key == "oai_dc:dc":
+            return DCTester(self.metadata_key, some_json)
+        elif self.metadata_key == "xoai":
+            return XOAITester(some_json)
+        elif self.metadata_key == "mods":
+            return MODSTester(some_json)
 
     @staticmethod
     def __write_to_disk(document, name):
@@ -261,7 +254,9 @@ class MODSTester:
                 for url in location['url']:
                     if url['@access'] == "preview":
                         has_a_thumbnail = True
-        except KeyError:
+        except KeyError as my_exception:
+            print(my_exception)
+        except TypeError:
             pass
         return has_a_thumbnail
 
@@ -274,6 +269,8 @@ class MODSTester:
                     if url['@access'] == "object in context":
                         has_object_in_context = True
         except KeyError:
+            pass
+        except TypeError:
             pass
         return has_object_in_context
 
