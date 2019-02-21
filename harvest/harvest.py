@@ -223,12 +223,10 @@ class MODSTester:
         try:
             if type(title_info) is list:
                 for title in title_info:
-                    if "@type" in title:
-                        if title['@type'] != "alternative":
+                    if "@type" in title['title']:
+                        if title['title']['@type'] != "alternative":
                             has_title = True
-                    elif "#text" in title:
-                        has_title = True
-                    elif type(title) is str:
+                    elif type(title['title']) is str:
                         has_title = True
             elif type(title_info) is dict:
                 if "@type" in title_info['title']:
