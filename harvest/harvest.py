@@ -234,6 +234,13 @@ class MODSTester:
                         has_title = True
                 elif type(title_info['title']) is str:
                     has_title = True
+                elif type(title_info['title']) is list:
+                    for title in (title_info['title']):
+                        if "@type" in title:
+                            if title['@type'] != "alternative":
+                                has_title = True
+                        elif type(title) is str:
+                            has_title = True
         except KeyError:
             pass
         return has_title
