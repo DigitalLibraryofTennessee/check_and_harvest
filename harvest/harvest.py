@@ -184,7 +184,18 @@ class XOAITester:
         return has_a_title
 
     def __check_handle(self):
-        return
+        has_a_handle = False
+        try:
+            for element in self.document['metatdata']:
+                if element['@name'] == "DC":
+                    for dc_path in element:
+                        if dc_path['@name'] == 'identifier':
+                            for path in dc_path['idenitifier']:
+                                if path['name'] == True:
+                                    has_a_handle = True
+        except KeyError:
+            pass
+        return has_a_handle
 
     def __check_thumbnails(self):
         has_thumbnail = False
