@@ -1,4 +1,4 @@
-from harvest.harvest import OAIRequest
+from harvest.harvest import OAIChecker
 import argparse
 from repox.repox import Repox
 import yaml
@@ -58,11 +58,11 @@ def main():
             args.provider
         )
         for dataset in sets:
-            request = OAIRequest(args.oai_endpoint, dataset, args.metadata_format, harvest_records)
+            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records)
             request.list_records()
             print(f'{dataset} currently has {request.bad_records} bad records.')
     else:
-        request = OAIRequest(args.oai_endpoint, oai_set, args.metadata_format, harvest_records)
+        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records)
         request.list_records()
         print(f'This set currently has {request.bad_records} bad records.')
     return

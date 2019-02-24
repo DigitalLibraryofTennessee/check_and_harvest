@@ -4,7 +4,7 @@ import json
 import xmltodict
 
 
-class OAIRequest:
+class OAIChecker:
     def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True):
         self.oai_base = endpoint
         self.harvest = harvest
@@ -191,7 +191,7 @@ class XOAITester:
                     for dc_path in element:
                         if dc_path['@name'] == 'identifier':
                             for path in dc_path['idenitifier']:
-                                if path['name'] == True:
+                                if path['name'] is True:
                                     has_a_handle = True
         except KeyError:
             pass
@@ -318,7 +318,7 @@ class MODSTester:
 
 
 if __name__ == "__main__":
-    #x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
-    x = OAIRequest("http://dlynx.rhodes.edu:8080/oai/request", "col_10267_34285", "xoai")
+    # x = OAIRequest("http://nashville.contentdm.oclc.org/oai/oai.php", "nr", "oai_qdc").list_records()
+    x = OAIChecker("http://dlynx.rhodes.edu:8080/oai/request", "col_10267_34285", "xoai")
     x.list_records()
     print(f'Set currently has {x.bad_records} bad records.')
