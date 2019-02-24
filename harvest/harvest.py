@@ -5,14 +5,25 @@ import xmltodict
 
 
 class OAIChecker:
+    """A class to run tests and harvest of metadata records via OAI-PMH.
+
+    Attributes:
+        oai_base_url (str): The base url of the OAI-PMH endpoint.
+        harvest (bool): Whether or not good records will be serialized to disk.
+        endpoint (str): Full OAI-PMH request.
+        metadata_prefix (str): The metadata prefix to use in OAI-PMH requests.
+        metadata_key (str): The key of the root metadata record.
+        set (str): The set to be harvested via OAI-PMH or an empty string.
+        bad_records (int): The total number of bad objects found in this request.
+    """
     def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True):
-        self.oai_base = endpoint
+        self.oai_base_url = endpoint
         self.harvest = harvest
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
-        self.token = ""
+        self.__token = ""
         self.metadata_prefix = prefix
         self.metadata_key = self.__set_metadata_key(prefix)
-        self.status = "In Progress"
+        self.__status = "In Progress"
         self.set = oai_set
         self.bad_records = 0
 
@@ -46,9 +57,9 @@ class OAIChecker:
 
     def process_token(self, token):
         if len(token) == 1:
-            self.token = f'&resumptionToken={token[0].text}'
+            self.__token = f'&resumptionToken={token[0].text}'
         else:
-            self.status = "Done"
+            self.__status = "Done"
         return
 
     def list_records(self):
@@ -56,8 +67,8 @@ class OAIChecker:
         oai_document = etree.fromstring(r.content)
         self.process_token(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}resumptionToken'))
         self.__process_records(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}record'))
-        if self.status is not "Done":
-            self.endpoint = f"{self.oai_base}?verb=ListRecords{self.token}"
+        if self.__status is not "Done":
+            self.endpoint = f"{self.oai_base_url}?verb=ListRecords{self.__token}"
             return self.list_records()
         else:
             return
@@ -102,6 +113,13 @@ class OAIChecker:
 
 
 class DCTester:
+    """A class to test DC records
+
+        Attributes:
+            metadata_key (str): The base node of the metadata rcord.
+            document (dict):  The DC record to be tested.
+            is_good (bool): Whether or not the document passed defined tests.
+        """
     def __init__(self, metadata_format, document):
         self.metadata_key = metadata_format
         self.document = document
@@ -157,6 +175,12 @@ class DCTester:
 
 
 class XOAITester:
+    """A class to run tests of xoai records.
+
+    Attributes:
+        document (dict): The metadata document to be tested as a dict.
+        is_good (bool): Whether the tested document passed the defined tests.
+    """
     def __init__(self, document):
         self.document = document
         self.is_good = self.__test()
@@ -212,6 +236,12 @@ class XOAITester:
 
 
 class MODSTester:
+    """A class to test MODS records
+
+    Attributes:
+        document (dict):  The MODS record to be tested.
+        is_good (bool): Whether or not the document passed defined tests.
+    """
     def __init__(self, document):
         self.document = document
         self.is_good = self.__test()
