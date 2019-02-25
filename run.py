@@ -4,6 +4,18 @@ from repox.repox import Repox
 import yaml
 
 
+def create_config():
+    config = {}
+    print("\nYikes!  Looks like you're missing a config, so we can't read data from Repox.\n")
+    config['username'] = input("\t1. What's your Repox username?  ")
+    config['password'] = input("\t2. What's your Repox password?  ")
+    config['repox'] = input("\t3. What's the base URL of your Repox instance?  ")
+    print("\n")
+    with open('config.yml', 'w') as outfile:
+        yaml.dump(config, outfile, default_flow_style=False)
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(description="Check and Harvest if OAI records meet our requirements.")
     parser.add_argument(
@@ -51,7 +63,11 @@ def main():
     if args.oai_set:
         oai_set = args.oai_set
     if args.provider:
-        settings = yaml.safe_load(open('config.yml', 'r'))
+        try:
+            settings = yaml.safe_load(open('config.yml', 'r'))
+        except FileNotFoundError:
+            create_config()
+            settings = yaml.safe_load(open('config.yml', 'r'))
         sets = Repox(
             settings['repox'], settings['username'], settings['password']
         ).get_list_of_sets_from_provider(
