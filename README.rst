@@ -5,9 +5,6 @@ DLTN Check and Harvest
 .. image:: https://travis-ci.org/DigitalLibraryofTennessee/check_and_harvest.png
     :alt: TravisCI badge
 
-.. image:: https://badge.fury.io/py/dltn_checker.svg
-    :target: https://badge.fury.io/py/dltn_checker
-    :alt: PyPi Badge
 
 -----
 About
@@ -16,21 +13,25 @@ About
 Tests whether records from an OAI-PMH feed pass minimum requirements of DLTN and optionally harvests only the good
 records from a request to disk so that they can be added to Repox and included in the DPLA.
 
+--------
+Requires
+--------
+
+* python 3.7
+* pipenv (strongly recommend)
+
 -------
 Install
 -------
 
-If you're cool :sunglasses: :
+You're going to need to clone this down and build this with pipenv.
 
 .. code-block:: console
 
-    $ pipenv install dltn_checker
-
-Otherwise:
-
-.. code-block:: console
-
-    $ pip install dltn_checker
+    $ git clone https://github.com/DigitalLibraryofTennessee/check_and_harvest
+    $ cd check_and_harvest
+    $ pipenv install
+    $ pipenv shell
 
 --------
 Examples
