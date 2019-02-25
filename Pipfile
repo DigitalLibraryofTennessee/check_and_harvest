@@ -8,11 +8,7 @@ requests = "*"
 lxml = "*"
 xmltodict = "*"
 repox = "*"
-pyyaml = "*"
-
-[dev-packages]
-"flake8" = "*"
-pre-commit = "*"
+pyyaml = "==4.2b1"
 
 [requires]
 python_version = "3.7"
