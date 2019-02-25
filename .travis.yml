@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.7-dev"
+install:
+  - 'pip install pipenv'
+  - 'pipenv sync'
+script: python -m unittest --verbose
+branches:
+  only:
+- master
