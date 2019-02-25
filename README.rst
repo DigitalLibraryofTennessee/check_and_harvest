@@ -2,6 +2,13 @@
 DLTN Check and Harvest
 ======================
 
+.. image:: https://travis-ci.org/DigitalLibraryofTennessee/check_and_harvest.png
+    :alt: TravisCI badge
+
+.. image:: https://badge.fury.io/py/dltn_checker.svg
+    :target: https://badge.fury.io/py/dltn_checker
+    :alt: PyPi Badge
+
 -----
 About
 -----
@@ -12,6 +19,16 @@ records from a request to disk so that they can be added to Repox and included i
 -------
 Install
 -------
+
+If you're cool :sunglasses: :
+
+.. code-block:: console
+    $ pipenv install dltn_checker
+
+Otherwise:
+
+.. code-block:: console
+    $ pip install dltn_checker
 
 --------
 Examples
