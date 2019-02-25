@@ -7,4 +7,4 @@ install:
 script: python -m unittest --verbose
 branches:
   only:
-- master
+  - master
