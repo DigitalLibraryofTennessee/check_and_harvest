@@ -1,2 +1,6 @@
 output/*
 config.yml
+build/*
+dist/*
+dltn_checker.egg-info/*
+bad_records*
