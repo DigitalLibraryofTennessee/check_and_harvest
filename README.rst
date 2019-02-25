@@ -23,11 +23,13 @@ Install
 If you're cool :sunglasses: :
 
 .. code-block:: console
+
     $ pipenv install dltn_checker
 
 Otherwise:
 
 .. code-block:: console
+
     $ pip install dltn_checker
 
 --------
