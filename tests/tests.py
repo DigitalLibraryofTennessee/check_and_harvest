@@ -1,5 +1,5 @@
 import unittest
-from harvest.harvest import OAIChecker
+from dltnchecker.harvest import OAIChecker
 
 
 class HarvestTest(unittest.TestCase):

@@ -1,4 +1,4 @@
-from harvest.harvest import OAIChecker
+from dltnchecker.harvest import OAIChecker
 import argparse
 from repox.repox import Repox
 import yaml

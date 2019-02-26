@@ -4,3 +4,4 @@ build/*
 dist/*
 dltn_checker.egg-info/*
 bad_records*
+dltnchecker/__pycache__/*
