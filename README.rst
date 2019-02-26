@@ -94,7 +94,6 @@ By default, this will try to download the good files to a directory called outpu
 need to pass an additional parameter called harvest and set to False.
 
 .. code-block:: python
-    :emphasize-lines: 2
 
     from dltnchecker.harvest import OAIChecker
     request = OAIChecker("https://dpla.lib.utk.edu/repox/OAIHandler", "crossroads_sanitation", "MODS", harvest=False)
