@@ -5,6 +5,10 @@ DLTN Check and Harvest
 .. image:: https://travis-ci.org/DigitalLibraryofTennessee/check_and_harvest.png
     :alt: TravisCI badge
 
+.. image:: https://badge.fury.io/py/dltn-checker.svg
+    :target: https://badge.fury.io/py/dltn-checker
+    :alt: PyPI badge
+
 
 -----
 About
@@ -13,18 +17,14 @@ About
 Tests whether records from an OAI-PMH feed pass minimum requirements of DLTN and optionally harvests only the good
 records from a request to disk so that they can be added to Repox and included in the DPLA.
 
---------
-Requires
---------
-
-* python 3.7
-* pipenv (strongly recommend)
-
 -------
 Install
 -------
 
-You're going to need to clone this down and build this with pipenv.
+Running with Builtin Argument Parsing from a CLI
+================================================
+
+If you want to do it this way, you're going to need to clone this.  It's also suggested to  build this with pipenv.
 
 .. code-block:: console
 
@@ -33,9 +33,25 @@ You're going to need to clone this down and build this with pipenv.
     $ pipenv install
     $ pipenv shell
 
---------
-Examples
---------
+Using OAIChecker from the dltnchecker module
+============================================
+
+If you're cool :sunglasses: :
+
+.. code-block:: console
+
+    $ pipenv install dltn_checker
+
+Otherwise:
+
+.. code-block:: console
+
+    $ pip install dltn_checker
+
+
+------------------------------------------
+Examples with the Built In Argument Parser
+------------------------------------------
 
 1. Check for bad DC records in an entire OAI-PMH feed.
 
@@ -60,3 +76,27 @@ Examples
 .. code-block:: console
 
     $ python run -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
+
+----------------------------------------------------
+Examples using the OAIChecker Class from dltnchecker
+----------------------------------------------------
+
+Check a set to see if there are any bad files in a set.
+
+.. code-block:: python
+
+    from dltnchecker.harvest import OAIChecker
+    request = OAIChecker("https://dpla.lib.utk.edu/repox/OAIHandler", "crossroads_sanitation", "MODS")
+    request.list_records()
+    print(request.bad_records)
+
+By default, this will try to download the good files to a directory called output. If you don't want to download, you
+need to pass an additional parameter called harvest and set to False.
+
+.. code-block:: python
+    :emphasize-lines: 2
+
+    from dltnchecker.harvest import OAIChecker
+    request = OAIChecker("https://dpla.lib.utk.edu/repox/OAIHandler", "crossroads_sanitation", "MODS", harvest=False)
+    request.list_records()
+    print(request.bad_records)
