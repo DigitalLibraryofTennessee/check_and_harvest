@@ -188,7 +188,8 @@ class XOAITester:
     def __test(self):
         checks = [
             self.__check_thumbnails(),
-            self.__check_titles()
+            self.__check_titles(),
+            self.__check_for_a_handle(),
         ]
         if False in checks:
             return False
@@ -211,18 +212,20 @@ class XOAITester:
             pass
         return has_a_title
 
-    def __check_handle(self):
-        """@TODO: this is broken and isn't being called"""
+    def __check_for_a_handle(self):
         has_a_handle = False
         try:
-            for element in self.document['metatdata']:
-                if element['@name'] == "DC":
-                    for dc_path in element:
-                        if dc_path['@name'] == 'identifier':
-                            for path in dc_path['idenitifier']:
-                                if path['name'] is True:
-                                    has_a_handle = True
+            for k, v in self.document['metadata'].items():
+                if type(v) is list:
+                    for element in v:
+                        if element['@name'] == 'dc':
+                            for thing in element['element']:
+                                if thing['@name'] == 'identifier':
+                                    if thing['element']['@name'] == 'uri':
+                                        has_a_handle = True
         except KeyError:
+            pass
+        except TypeError:
             pass
         return has_a_handle
 
