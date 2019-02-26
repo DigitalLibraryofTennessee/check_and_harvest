@@ -188,7 +188,7 @@ class XOAITester:
     def __test(self):
         checks = [
             self.__check_thumbnails(),
-            self.__check_titles
+            self.__check_titles()
         ]
         if False in checks:
             return False
@@ -198,16 +198,21 @@ class XOAITester:
     def __check_titles(self):
         has_a_title = False
         try:
-            for element in self.document['metadata']:
-                if element['@name'] == "DC":
-                    for dc_path in element:
-                        if dc_path['@name'] == 'title':
-                            has_a_title = True
+            for k, v in self.document['metadata'].items():
+                if type(v) is list:
+                    for element in v:
+                        if element['@name'] == 'dc':
+                            for thing in element['element']:
+                                if thing['@name'] == 'title':
+                                    has_a_title = True
         except KeyError:
+            pass
+        except TypeError:
             pass
         return has_a_title
 
     def __check_handle(self):
+        """@TODO: this is broken and isn't being called"""
         has_a_handle = False
         try:
             for element in self.document['metatdata']:
@@ -261,8 +266,8 @@ class MODSTester:
 
     def __check_for_title(self):
         has_title = False
-        title_info = self.document['mods']['titleInfo']
         try:
+            title_info = self.document['mods']['titleInfo']
             if type(title_info) is list:
                 for title in title_info:
                     if "@type" in title['title']:
