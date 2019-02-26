@@ -2,6 +2,7 @@ import requests
 from lxml import etree
 import json
 import xmltodict
+import os
 
 
 class OAIChecker:
@@ -101,6 +102,8 @@ class OAIChecker:
     @staticmethod
     def __write_to_disk(document, name):
         filename = name.split(":")[-1].replace("/", "_")
+        if not os.path.exists("output"):
+            os.makedirs("output")
         with open(f"output/{filename}.xml", "w") as xml_file:
             xml_file.write(document.decode("utf-8"))
         return
