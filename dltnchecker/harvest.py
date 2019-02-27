@@ -98,6 +98,8 @@ class OAIChecker:
             return XOAITester(some_json)
         elif self.metadata_key == "mods":
             return MODSTester(some_json)
+        elif self.metadata_key == 'oai_qdc:qualifieddc':
+            return QDCTester(self.metadata_key, some_json)
 
     @staticmethod
     def __write_to_disk(document, name):
@@ -175,6 +177,63 @@ class DCTester:
                 return False
         except KeyError:
             return False
+
+
+class QDCTester:
+    """A class to rests of qdc records
+
+    """
+    def __init__(self, metadata_key, document):
+        self.metadata_key = metadata_key
+        self.document = document
+        self.is_good = self.__test()
+
+    def __test(self):
+        tests = [
+            self.__check_title(),
+            self.__check_rights(),
+            self.__check_identifiers(),
+        ]
+        if False in tests:
+            return False
+        else:
+            return True
+
+    def __check_title(self):
+        has_a_title = False
+        try:
+            if self.document[self.metadata_key]["dc:title"]:
+                has_a_title = True
+        except KeyError:
+            pass
+        return has_a_title
+
+    def __check_rights(self):
+        has_rights = False
+        try:
+            for k, v in self.document[self.metadata_key].items():
+                if k == "dc:rights":
+                    has_rights = True
+                elif k == "dcterms:accessRights":
+                    has_rights = True
+        except KeyError:
+            pass
+        return has_rights
+
+    def __check_identifiers(self):
+        has_a_uri = False
+        identifiers = self.document[self.metadata_key]["dc:identifier"]
+        try:
+            if type(identifiers) is str:
+                if identifiers.startswith("http"):
+                    has_a_uri = True
+            elif type(identifiers) is list:
+                for identifier in identifiers:
+                    if identifier.startswith("http"):
+                        has_a_uri = True
+        except KeyError:
+            pass
+        return has_a_uri
 
 
 class XOAITester:
