@@ -1,6 +1,6 @@
 import unittest
-from dltnchecker.harvest import OAIChecker, XOAITester, MODSTester
-from tests.test_data import xoai_bad_records, xoai_good_records, mods_bad_records
+from dltnchecker.harvest import OAIChecker, XOAITester, MODSTester, DCTester
+from tests.test_data import xoai_bad_records, xoai_good_records, mods_bad_records, dc_bad_records
 
 
 class HarvestTest(unittest.TestCase):
@@ -28,3 +28,7 @@ class TestMetadataTesters(unittest.TestCase):
     def test_bad_mods_records(self):
         for record in mods_bad_records:
             self.assertFalse(MODSTester(record).is_good)
+
+    def test_bad_dc_records(self):
+        for record in dc_bad_records:
+            self.assertFalse(DCTester('oai_dc:dc', record).is_good)
