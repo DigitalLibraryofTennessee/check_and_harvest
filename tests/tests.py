@@ -1,5 +1,6 @@
 import unittest
-from dltnchecker.harvest import OAIChecker
+from dltnchecker.harvest import OAIChecker, XOAITester, MODSTester
+from tests.test_data import xoai_bad_records, xoai_good_records, mods_bad_records
 
 
 class HarvestTest(unittest.TestCase):
@@ -10,3 +11,20 @@ class HarvestTest(unittest.TestCase):
     def test_initialization(self):
         self.assertIsInstance(OAIChecker("http://nashville.contentdm.oclc.org/oai/oai.php"), OAIChecker)
         self.assertIsInstance(OAIChecker("http://nashville.contentdm.oclc.org/oai/oai.php", "test", "MODS"), OAIChecker)
+
+
+class TestMetadataTesters(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        super(TestMetadataTesters, self).__init__(*args, **kwargs)
+
+    def test_bad_xoai_records(self):
+        for record in xoai_bad_records:
+            self.assertFalse(XOAITester(record).is_good)
+
+    def test_good_xoai_records(self):
+        for record in xoai_good_records:
+            self.assertTrue(XOAITester(record).is_good)
+
+    def test_bad_mods_records(self):
+        for record in mods_bad_records:
+            self.assertFalse(MODSTester(record).is_good)
