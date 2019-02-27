@@ -224,7 +224,11 @@ class XOAITester:
                         if element['@name'] == 'dc':
                             for thing in element['element']:
                                 if thing['@name'] == 'identifier':
-                                    if thing['element']['@name'] == 'uri':
+                                    if type(thing['element']) is list:
+                                        for item in thing['element']:
+                                            if item['@name'] == 'uri':
+                                                has_a_handle = True
+                                    elif thing['element']['@name'] == 'uri':
                                         has_a_handle = True
         except KeyError:
             pass
