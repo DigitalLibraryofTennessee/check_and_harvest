@@ -17,10 +17,11 @@ class OAIChecker:
         set (str): The set to be harvested via OAI-PMH or an empty string.
         bad_records (int): The total number of bad objects found in this request.
     """
-    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True, which="good"):
+    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True, which="good", test_url=False):
         self.oai_base_url = endpoint
         self.harvest = harvest
         self.which = which
+        self.test_url = test_url
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
         self.__token = ""
         self.metadata_prefix = prefix
@@ -96,7 +97,7 @@ class OAIChecker:
 
     def __record_test(self, some_json):
         if self.metadata_key == "oai_dc:dc":
-            return DCTester(self.metadata_key, some_json)
+            return DCTester(self.metadata_key, some_json, self.test_url)
         elif self.metadata_key == "xoai":
             return XOAITester(some_json)
         elif self.metadata_key == "mods":
@@ -128,7 +129,8 @@ class DCTester:
             document (dict):  The DC record to be tested.
             is_good (bool): Whether or not the document passed defined tests.
         """
-    def __init__(self, metadata_format, document):
+    def __init__(self, metadata_format, document, test_urls=False):
+        self.test_url = test_urls
         self.metadata_key = metadata_format
         self.document = document
         self.is_good = self.__test()
@@ -167,14 +169,22 @@ class DCTester:
         try:
             if type(identifiers) is str:
                 if identifiers.startswith("http"):
-                    return True
+                    if self.test_url is True:
+                        return URLTester(identifiers).is_good
+                    else:
+                        return True
                 else:
                     return False
             elif type(identifiers) is list:
                 good = False
                 for identifier in identifiers:
                     if identifier.startswith("http"):
-                        good = True
+                        if self.test_url is True:
+                            test_url = URLTester(identifier)
+                            if test_url.is_good is True:
+                                good = True
+                        else:
+                            good = True
                 return good
             else:
                 return False
@@ -422,6 +432,20 @@ class MODSTester:
         except TypeError:
             pass
         return has_object_in_context
+
+
+class URLTester:
+    """Class to test whether a metadata record is actually online."""
+    def __init__(self, uri, bad_status_codes=(302, 404, 403)):
+        self.bad_statuses = bad_status_codes
+        self.is_good = self.__test(uri)
+
+    def __test(self, url):
+        r = requests.get(url).status_code
+        if r not in self.bad_statuses:
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":

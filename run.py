@@ -61,9 +61,17 @@ def main():
         help="When harvesting, specify good records or bad records.",
         required=False
     )
+    parser.add_argument(
+        '-tu',
+        '--test_urls',
+        dest='test_urls',
+        help='When testing DC records, specify whether to see if URLs are resolvable.',
+        default='False'
+    )
 
     args = parser.parse_args()
     harvest_records = True
+    test_urls = False
     oai_set = ""
     which_record = "good"
     if args.harvest_records.lower() == "false":
@@ -74,6 +82,8 @@ def main():
         acceptable_values = ('good', 'bad')
         if args.which_record.lower() in acceptable_values:
             which_record = args.which_record.lower()
+    if args.test_urls.lower() == 'true':
+        test_urls = True
     if args.provider:
         try:
             settings = yaml.safe_load(open('config.yml', 'r'))
@@ -86,11 +96,12 @@ def main():
             args.provider
         )
         for dataset in sets:
-            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records, which_record)
+            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records, which_record,
+                                 test_urls)
             request.list_records()
             print(f'{dataset} currently has {request.bad_records} bad records.')
     else:
-        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records, which_record)
+        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records, which_record, test_urls)
         request.list_records()
         print(f'This set currently has {request.bad_records} bad records.')
     return
