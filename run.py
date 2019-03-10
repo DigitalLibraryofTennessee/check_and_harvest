@@ -54,14 +54,26 @@ def main():
         help="Harvest all sets from provider",
         required=False
     )
+    parser.add_argument(
+        '-w',
+        '--which_record_type',
+        dest='which_record',
+        help="When harvesting, specify good records or bad records.",
+        required=False
+    )
 
     args = parser.parse_args()
     harvest_records = True
     oai_set = ""
+    which_record = "good"
     if args.harvest_records.lower() == "false":
         harvest_records = False
     if args.oai_set:
         oai_set = args.oai_set
+    if args.which_record:
+        acceptable_values = ('good', 'bad')
+        if args.which_record.lower() in acceptable_values:
+            which_record = args.which_record.lower()
     if args.provider:
         try:
             settings = yaml.safe_load(open('config.yml', 'r'))
@@ -74,11 +86,11 @@ def main():
             args.provider
         )
         for dataset in sets:
-            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records)
+            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records, which_record)
             request.list_records()
             print(f'{dataset} currently has {request.bad_records} bad records.')
     else:
-        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records)
+        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records, which_record)
         request.list_records()
         print(f'This set currently has {request.bad_records} bad records.')
     return

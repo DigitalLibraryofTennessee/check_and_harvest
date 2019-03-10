@@ -17,9 +17,10 @@ class OAIChecker:
         set (str): The set to be harvested via OAI-PMH or an empty string.
         bad_records (int): The total number of bad objects found in this request.
     """
-    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True):
+    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True, which="good"):
         self.oai_base_url = endpoint
         self.harvest = harvest
+        self.which = which
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
         self.__token = ""
         self.metadata_prefix = prefix
@@ -84,9 +85,11 @@ class OAIChecker:
                     record_as_xml = etree.tostring(rec)
                     record_as_json = json.loads(json.dumps(xmltodict.parse(record_as_xml)))
                     record_test = self.__record_test(record_as_json)
-                    if record_test.is_good is True and self.harvest is True:
-                        self.__write_to_disk(record_as_xml, filename)
-                    elif record_test.is_good is False:
+                    if self.harvest is True:
+                        if self.which == "good" and record_test.is_good is True \
+                                or self.which == "bad" and record_test.is_good is False:
+                            self.__write_to_disk(record_as_xml, filename)
+                    if record_test.is_good is False:
                         self.bad_records += 1
                         self.__write_bad_records_to_log(record_as_json)
         return
