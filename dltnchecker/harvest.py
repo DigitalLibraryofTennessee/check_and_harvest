@@ -436,13 +436,13 @@ class MODSTester:
 
 class URLTester:
     """Class to test whether a metadata record is actually online."""
-    def __init__(self, uri, bad_status_codes=(302, 404, 403)):
-        self.bad_statuses = bad_status_codes
+    def __init__(self, uri, good_status_codes=(200, 202)):
+        self.good_statuses = good_status_codes
         self.is_good = self.__test(uri)
 
     def __test(self, url):
         r = requests.get(url).status_code
-        if r not in self.bad_statuses:
+        if r in self.good_statuses:
             return True
         else:
             return False
