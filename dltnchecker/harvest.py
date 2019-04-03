@@ -101,7 +101,7 @@ class OAIChecker:
         elif self.metadata_key == "xoai":
             return XOAITester(some_json)
         elif self.metadata_key == "mods":
-            return MODSTester(some_json)
+            return MODSTester(some_json, self.test_url)
         elif self.metadata_key == 'oai_qdc:qualifieddc':
             return QDCTester(self.metadata_key, some_json)
 
@@ -329,7 +329,8 @@ class MODSTester:
         document (dict):  The MODS record to be tested.
         is_good (bool): Whether or not the document passed defined tests.
     """
-    def __init__(self, document):
+    def __init__(self, document, test_urls=False):
+        self.test_url = test_urls
         self.document = document
         self.is_good = self.__test()
 
@@ -412,7 +413,12 @@ class MODSTester:
             if 'url' in location:
                 for url in location['url']:
                     if url['@access'] == "preview":
-                        has_a_thumbnail = True
+                        if self.test_url is True:
+                            test_url = URLTester(url['#text'])
+                            if test_url.is_good is True:
+                                has_a_thumbnail = True
+                        else:
+                            has_a_thumbnail = True
         except KeyError:
             pass
         except TypeError:
@@ -426,7 +432,12 @@ class MODSTester:
             if 'url' in location:
                 for url in location['url']:
                     if url['@access'] == "object in context":
-                        has_object_in_context = True
+                        if self.test_url is True:
+                            test_url = URLTester(url['#text'])
+                            if test_url.is_good is True:
+                                has_object_in_context = True
+                        else:
+                            has_object_in_context = True
         except KeyError:
             pass
         except TypeError:
@@ -445,6 +456,7 @@ class URLTester:
         if r in self.good_statuses:
             return True
         else:
+            print(f"{r}: {url}")
             return False
 
 
