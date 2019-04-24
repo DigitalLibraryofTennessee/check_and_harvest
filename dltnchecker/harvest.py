@@ -256,7 +256,8 @@ class XOAITester:
         document (dict): The metadata document to be tested as a dict.
         is_good (bool): Whether the tested document passed the defined tests.
     """
-    def __init__(self, document):
+    def __init__(self, document, test_urls=False):
+        self.test_urls = test_urls
         self.document = document
         self.is_good = self.__test()
 
