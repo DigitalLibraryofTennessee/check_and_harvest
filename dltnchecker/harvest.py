@@ -433,12 +433,13 @@ class MODSTester:
             if 'url' in location:
                 for url in location['url']:
                     if url['@access'] == "object in context":
-                        if self.test_url is True:
-                            test_url = URLTester(url['#text'])
-                            if test_url.is_good is True:
+                        if url['@usage'] == "primary display":
+                            if self.test_url is True:
+                                test_url = URLTester(url['#text'])
+                                if test_url.is_good is True:
+                                    has_object_in_context = True
+                            else:
                                 has_object_in_context = True
-                        else:
-                            has_object_in_context = True
         except KeyError:
             pass
         except TypeError:
