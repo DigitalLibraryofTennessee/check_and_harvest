@@ -4,10 +4,9 @@ DLTN Check and Harvest
 
 .. image:: https://travis-ci.org/DigitalLibraryofTennessee/check_and_harvest.png
     :alt: TravisCI badge
-
 .. image:: https://badge.fury.io/py/dltn-checker.svg
     :target: https://badge.fury.io/py/dltn-checker
-    :alt: PyPI badge
+    :alt: pypi badge
 
 
 -----
@@ -65,7 +64,7 @@ Examples with the Built In Argument Parser
 
     $ python run -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc -H True
 
-3. Check and harvest good xoai records from a specifc set.
+3. Check and harvest good xoai records from a specific set.
 
 .. code-block:: console
 
