@@ -76,6 +76,10 @@ Examples with the Built In Argument Parser
 
     $ python run -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
 
+5. Check and harvest good MODS records from a provider and ensure that the thumbnail and link to the objects resolve.
+
+    $ python run - e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
+
 ----------------------------------------------------
 Examples using the OAIChecker Class from dltnchecker
 ----------------------------------------------------
