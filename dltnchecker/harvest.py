@@ -433,7 +433,7 @@ class MODSTester:
             if 'url' in location:
                 for url in location['url']:
                     if url['@access'] == "object in context":
-                        if url['@usage'] == "primary display":
+                        if "primary" in url['@usage']:
                             if self.test_url is True:
                                 test_url = URLTester(url['#text'])
                                 if test_url.is_good is True:
