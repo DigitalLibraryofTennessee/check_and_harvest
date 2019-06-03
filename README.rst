@@ -78,7 +78,16 @@ Examples with the Built In Argument Parser
 
 5. Check and harvest good MODS records from a provider and ensure that the thumbnail and link to the objects resolve.
 
+.. code-block:: console
+
     $ python run - e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
+
+6. Check and harvest good MODS records from a provider, ensure that the thumbnail and link to object are good, and limit
+to records added since January 1, 2015.
+
+.. code-block:: console
+
+    $ python run - e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
 
 ----------------------------------------------------
 Examples using the OAIChecker Class from dltnchecker

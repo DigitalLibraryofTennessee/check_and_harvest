@@ -17,12 +17,13 @@ class OAIChecker:
         set (str): The set to be harvested via OAI-PMH or an empty string.
         bad_records (int): The total number of bad objects found in this request.
     """
-    def __init__(self, endpoint, oai_set="", prefix="oai_dc", harvest=True, which="good", test_url=False):
+    def __init__(self, endpoint, oai_set="", oai_from="", oai_until="", prefix="oai_dc",
+                 harvest=True, which="good", test_url=False):
         self.oai_base_url = endpoint
         self.harvest = harvest
         self.which = which
         self.test_url = test_url
-        self.endpoint = self.set_endpoint(endpoint, oai_set, prefix)
+        self.endpoint = self.set_endpoint(endpoint, oai_set, prefix, oai_from, oai_until)
         self.__token = ""
         self.metadata_prefix = prefix
         self.metadata_key = self.__set_metadata_key(prefix)
@@ -42,10 +43,15 @@ class OAIChecker:
         return metadata_keys[metadata_format]
 
     @staticmethod
-    def set_endpoint(our_endpoint, our_set, our_prefix):
+    def set_endpoint(our_endpoint, our_set, our_prefix, our_from, our_until):
         endpoint = f"{our_endpoint}?verb=ListRecords&metadataPrefix={our_prefix}"
         if our_set != "":
             endpoint = f"{endpoint}&set={our_set}"
+        if our_from != "":
+            endpoint = f"{endpoint}&from={our_from}"
+        if our_until != "":
+            endpoint = f"{endpoint}&until={our_until}"
+        print(endpoint)
         return endpoint
 
     def __get_root_tag_and_namespace(self):

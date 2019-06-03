@@ -65,19 +65,37 @@ def main():
         '-tu',
         '--test_urls',
         dest='test_urls',
-        help='When testing DC records, specify whether to see if URLs are resolvable.',
+        help='When testing oai records, specify whether to see if URLs are resolvable.',
         default='False'
+    )
+    parser.add_argument(
+        '-f',
+        '--from',
+        dest='oai_from',
+        help='Specify a from parameter on oai_requests.'
+    )
+    parser.add_argument(
+        '-u',
+        '--until',
+        dest='oai_until',
+        help='Specify a until parameter on oai_requests.'
     )
 
     args = parser.parse_args()
     harvest_records = True
     test_urls = False
     oai_set = ""
+    oai_from = ''
+    oai_until = ''
     which_record = "good"
     if args.harvest_records.lower() == "false":
         harvest_records = False
     if args.oai_set:
         oai_set = args.oai_set
+    if args.oai_from:
+        oai_from = args.oai_from
+    if args.oai_until:
+        oai_until = args.oai_until
     if args.which_record:
         acceptable_values = ('good', 'bad')
         if args.which_record.lower() in acceptable_values:
@@ -96,12 +114,13 @@ def main():
             args.provider
         )
         for dataset in sets:
-            request = OAIChecker(args.oai_endpoint, dataset, args.metadata_format, harvest_records, which_record,
-                                 test_urls)
+            request = OAIChecker(args.oai_endpoint, dataset, oai_from, oai_until, args.metadata_format, harvest_records,
+                                 which_record, test_urls)
             request.list_records()
             print(f'{dataset} currently has {request.bad_records} bad records.')
     else:
-        request = OAIChecker(args.oai_endpoint, oai_set, args.metadata_format, harvest_records, which_record, test_urls)
+        request = OAIChecker(args.oai_endpoint, oai_set, oai_from, oai_until, args.metadata_format, harvest_records,
+                             which_record, test_urls)
         request.list_records()
         print(f'This set currently has {request.bad_records} bad records.')
     return
