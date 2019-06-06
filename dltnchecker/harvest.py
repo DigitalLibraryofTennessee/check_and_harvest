@@ -325,8 +325,8 @@ class XOAITester:
                             for element in bundle['element']['element']['field']:
                                 if element['@name'] == 'url':
                                     test_url = URLTester(element['#text'])
-                            if test_url.is_good is True:
-                                has_thumbnail = True
+                                    if test_url.is_good is True:
+                                        has_thumbnail = True
                         else:
                             has_thumbnail = True
                 except TypeError:
