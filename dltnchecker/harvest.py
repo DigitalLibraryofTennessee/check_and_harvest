@@ -51,7 +51,7 @@ class OAIChecker:
             endpoint = f"{endpoint}&from={our_from}"
         if our_until != "":
             endpoint = f"{endpoint}&until={our_until}"
-        print(endpoint)
+        print(f'\nHarvesting records from: {endpoint}\n')
         return endpoint
 
     def __get_root_tag_and_namespace(self):
@@ -105,7 +105,7 @@ class OAIChecker:
         if self.metadata_key == "oai_dc:dc":
             return DCTester(self.metadata_key, some_json, self.test_url)
         elif self.metadata_key == "xoai":
-            return XOAITester(some_json)
+            return XOAITester(some_json, self.test_url)
         elif self.metadata_key == "mods":
             return MODSTester(some_json, self.test_url)
         elif self.metadata_key == 'oai_qdc:qualifieddc':
@@ -321,7 +321,14 @@ class XOAITester:
             for bundle in self.document['metadata']['element'][1]['element']:
                 try:
                     if bundle['field']['#text'] == 'THUMBNAIL':
-                        has_thumbnail = True
+                        if self.test_urls is True:
+                            for element in bundle['element']['element']['field']:
+                                if element['@name'] == 'url':
+                                    test_url = URLTester(element['#text'])
+                            if test_url.is_good is True:
+                                has_thumbnail = True
+                        else:
+                            has_thumbnail = True
                 except TypeError:
                     pass
         except KeyError:
