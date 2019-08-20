@@ -109,7 +109,7 @@ class OAIChecker:
         elif self.metadata_key == "mods":
             return MODSTester(some_json, self.test_url)
         elif self.metadata_key == 'oai_qdc:qualifieddc':
-            return QDCTester(self.metadata_key, some_json)
+            return QDCTester(self.metadata_key, some_json, self.test_url)
 
     @staticmethod
     def __write_to_disk(document, name):
@@ -199,11 +199,12 @@ class DCTester:
 
 
 class QDCTester:
-    """A class to rests of qdc records
+    """A class to test qdc records
 
     """
-    def __init__(self, metadata_key, document):
+    def __init__(self, metadata_key, document, test_urls=False):
         self.metadata_key = metadata_key
+        self.test_url = test_urls
         self.document = document
         self.is_good = self.__test()
 
@@ -245,11 +246,21 @@ class QDCTester:
         try:
             if type(identifiers) is str:
                 if identifiers.startswith("http"):
-                    has_a_uri = True
+                    if self.test_url is True:
+                        test_url = URLTester(identifiers)
+                        if test_url.is_good is True:
+                            has_a_uri = True
+                    else:
+                        has_a_uri = True
             elif type(identifiers) is list:
                 for identifier in identifiers:
                     if identifier.startswith("http"):
-                        has_a_uri = True
+                        if self.test_url is True:
+                            test_url = URLTester(identifier)
+                            if test_url.is_good is True:
+                                has_a_uri = True
+                        else:
+                            has_a_uri = True
         except KeyError:
             pass
         return has_a_uri
