@@ -56,38 +56,38 @@ Examples with the Built In Argument Parser
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc
 
 2. Check and harvest good DC records from an entire OAI-PMH feed.
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc -H True
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc -H True
 
 3. Check and harvest good xoai records from a specific set.
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m xoai -s my_awesome_xoai_set -H True
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m xoai -s my_awesome_xoai_set -H True
 
 4. Check and harvest good MODS records from an entire provider in Repox.
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
 
 5. Check and harvest good MODS records from a provider and ensure that the thumbnail and link to the objects resolve.
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
 
 6. Check and harvest good MODS records from a provider, ensure that the thumbnail and link to object are good, and limit
 to records added since January 1, 2015.
 
 .. code-block:: console
 
-    $ python run -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
+    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
 
 ----------------------------------------------------
 Examples using the OAIChecker Class from dltnchecker
