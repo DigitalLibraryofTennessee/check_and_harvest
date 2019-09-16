@@ -3,6 +3,7 @@ from lxml import etree
 import json
 import xmltodict
 import os
+import time
 
 
 class OAIChecker:
@@ -72,15 +73,19 @@ class OAIChecker:
         return
 
     def list_records(self):
-        r = requests.get(f"{self.endpoint}")
-        oai_document = etree.fromstring(r.content)
-        self.process_token(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}resumptionToken'))
-        self.__process_records(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}record'))
-        if self.__status is not "Done":
-            self.endpoint = f"{self.oai_base_url}?verb=ListRecords{self.__token}"
+        try:
+            r = requests.get(f"{self.endpoint}")
+            oai_document = etree.fromstring(r.content)
+            self.process_token(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}resumptionToken'))
+            self.__process_records(oai_document.findall('.//{http://www.openarchives.org/OAI/2.0/}record'))
+            if self.__status is not "Done":
+                self.endpoint = f"{self.oai_base_url}?verb=ListRecords{self.__token}"
+                return self.list_records()
+            else:
+                return
+        except requests.exceptions.ConnectionError:
+            time.sleep(10)
             return self.list_records()
-        else:
-            return
 
     def __process_records(self, all_metadata):
         for record in all_metadata:
@@ -478,12 +483,16 @@ class URLTester:
         self.is_good = self.__test(uri)
 
     def __test(self, url):
-        r = requests.get(url).status_code
-        if r in self.good_statuses:
-            return True
-        else:
-            print(f"{r}: {url}")
-            return False
+        try:
+            r = requests.get(url).status_code
+            if r in self.good_statuses:
+                return True
+            else:
+                print(f"{r}: {url}")
+                return False
+        except requests.exceptions.ConnectionError:
+            time.sleep(10)
+            return self.__test(url)
 
 
 if __name__ == "__main__":
