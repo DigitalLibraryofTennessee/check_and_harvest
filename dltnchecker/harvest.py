@@ -392,6 +392,8 @@ class MODSTester:
                 if "@type" in title_info['title']:
                     if title_info['title']['@type'] != "alternative":
                         has_title = True
+                elif "@supplied" in title_info:
+                    has_title = False
                 elif type(title_info['title']) is str:
                     has_title = True
                 elif type(title_info['title']) is list:
