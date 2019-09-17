@@ -383,11 +383,12 @@ class MODSTester:
             title_info = self.document['mods']['titleInfo']
             if type(title_info) is list:
                 for title in title_info:
-                    if "@type" in title['title']:
-                        if title['title']['@type'] != "alternative":
+                    if '@supplied' not in title:
+                        if "@type" in title['title']:
+                            if title['title']['@type'] != "alternative":
+                                has_title = True
+                        elif type(title['title']) is str:
                             has_title = True
-                    elif type(title['title']) is str:
-                        has_title = True
             elif type(title_info) is dict:
                 if "@type" in title_info['title']:
                     if title_info['title']['@type'] != "alternative":
