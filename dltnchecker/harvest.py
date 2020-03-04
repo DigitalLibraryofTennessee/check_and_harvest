@@ -19,11 +19,12 @@ class OAIChecker:
         bad_records (int): The total number of bad objects found in this request.
     """
     def __init__(self, endpoint, oai_set="", oai_from="", oai_until="", prefix="oai_dc",
-                 harvest=True, which="good", test_url=False):
+                 harvest=True, which="good", test_url=False, test_restricted=False):
         self.oai_base_url = endpoint
         self.harvest = harvest
         self.which = which
         self.test_url = test_url
+        self.test_restricted=False
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix, oai_from, oai_until)
         self.__token = ""
         self.metadata_prefix = prefix
@@ -114,7 +115,7 @@ class OAIChecker:
         elif self.metadata_key == "mods":
             return MODSTester(some_json, self.test_url)
         elif self.metadata_key == 'oai_qdc:qualifieddc':
-            return QDCTester(self.metadata_key, some_json, self.test_url)
+            return QDCTester(self.metadata_key, some_json, self.test_url, self.test_restricted)
 
     @staticmethod
     def __write_to_disk(document, name):
@@ -207,9 +208,10 @@ class QDCTester:
     """A class to test qdc records
 
     """
-    def __init__(self, metadata_key, document, test_urls=False):
+    def __init__(self, metadata_key, document, test_urls=False, test_restricted=False):
         self.metadata_key = metadata_key
         self.test_url = test_urls
+        self.test_restricted = test_restricted
         self.document = document
         self.is_good = self.__test()
 
@@ -255,6 +257,10 @@ class QDCTester:
                         test_url = URLTester(identifiers)
                         if test_url.is_good is True:
                             has_a_uri = True
+                    elif self.test_restricted is True:
+                        test_url = RestrictionTester(identifiers)
+                        if test_url.is_good == True:
+                            has_a_uri = True
                     else:
                         has_a_uri = True
             elif type(identifiers) is list:
@@ -264,8 +270,13 @@ class QDCTester:
                             test_url = URLTester(identifier)
                             if test_url.is_good is True:
                                 has_a_uri = True
+                        elif self.test_restricted is True:
+                            test_url = RestrictionTester(identifier)
+                            if test_url.is_good == True:
+                                has_a_uri = True
                         else:
                             has_a_uri = True
+
         except KeyError:
             pass
         return has_a_uri
@@ -496,6 +507,22 @@ class URLTester:
         except requests.exceptions.ConnectionError:
             time.sleep(10)
             return self.__test(url)
+
+
+class RestrictionTester:
+    """Class to test whether or not an object is restricted from view."""
+    def __init__(self, uri):
+        self.is_good = self.__test(uri)
+
+    def __test(self, url):
+        good_codes = (200, 202)
+        r = requests.get(url)
+        if r.status_code in good_codes and "This item is restricted to only allow viewing of the metadata." in str(r.content):
+            return False
+        elif r.status_code in good_codes and "This item is restricted to only allow viewing of the metadata." not in str(r.content):
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":

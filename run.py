@@ -69,6 +69,13 @@ def main():
         default='False'
     )
     parser.add_argument(
+        '-tr',
+        '--test_restricted',
+        dest='test_restricted',
+        help="When testing oai qdc records, specify whether to see if documents are restricted in the CMHF way.",
+        default='False'
+    )
+    parser.add_argument(
         '-f',
         '--from',
         dest='oai_from',
@@ -84,6 +91,7 @@ def main():
     args = parser.parse_args()
     harvest_records = True
     test_urls = False
+    test_restricted = False
     oai_set = ""
     oai_from = ''
     oai_until = ''
@@ -102,6 +110,8 @@ def main():
             which_record = args.which_record.lower()
     if args.test_urls.lower() == 'true':
         test_urls = True
+    if args.test_restricted.lower() == 'true':
+        test_restricted = True
     if args.provider:
         try:
             settings = yaml.safe_load(open('config.yml', 'r'))
@@ -115,12 +125,12 @@ def main():
         )
         for dataset in sets:
             request = OAIChecker(args.oai_endpoint, dataset, oai_from, oai_until, args.metadata_format, harvest_records,
-                                 which_record, test_urls)
+                                 which_record, test_urls, test_restricted)
             request.list_records()
             print(f'{dataset} currently has {request.bad_records} bad records.')
     else:
         request = OAIChecker(args.oai_endpoint, oai_set, oai_from, oai_until, args.metadata_format, harvest_records,
-                             which_record, test_urls)
+                             which_record, test_urls, test_restricted)
         request.list_records()
         print(f'This set currently has {request.bad_records} bad records.')
     return
