@@ -259,7 +259,7 @@ class QDCTester:
                             has_a_uri = True
                     elif self.test_restricted is True:
                         test_url = RestrictionTester(identifiers)
-                        if test_url.is_good == True:
+                        if test_url.is_good is True:
                             has_a_uri = True
                     else:
                         has_a_uri = True
@@ -272,7 +272,7 @@ class QDCTester:
                                 has_a_uri = True
                         elif self.test_restricted is True:
                             test_url = RestrictionTester(identifier)
-                            if test_url.is_good == True:
+                            if test_url.is_good is True:
                                 has_a_uri = True
                         else:
                             has_a_uri = True
