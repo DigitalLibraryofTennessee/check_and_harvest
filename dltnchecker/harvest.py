@@ -25,7 +25,7 @@ class OAIChecker:
         self.harvest = harvest
         self.which = which
         self.test_url = test_url
-        self.test_restricted=False
+        self.test_restricted = test_restricted
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix, oai_from, oai_until)
         self.__token = ""
         self.metadata_prefix = prefix
