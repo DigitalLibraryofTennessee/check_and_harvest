@@ -1,7 +1,7 @@
 import unittest
 from dltnchecker.harvest import OAIChecker, XOAITester, MODSTester, DCTester, QDCTester
 from tests.test_data import xoai_bad_records, xoai_good_records, mods_bad_records, dc_bad_records, qdc_bad_records, \
-    qdc_good_records, cmhf_restricted
+    qdc_good_records, cmhf_restricted, cmhf_not_restricted
 
 
 class HarvestTest(unittest.TestCase):
@@ -45,3 +45,7 @@ class TestMetadataTesters(unittest.TestCase):
     def test_ensure_restricted_records_from_cmhf_are_restricted(self):
         for record in cmhf_restricted:
             self.assertFalse(QDCTester('oai_qdc:qualifieddc', record, test_restricted=True).is_good)
+
+    def test_ensure_nonrestricted_records_from_cmhf_pass(self):
+        for record in cmhf_not_restricted:
+            self.assertTrue(QDCTester('oai_qdc:qualifieddc', record, test_restricted=True).is_good)
