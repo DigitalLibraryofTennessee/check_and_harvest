@@ -89,6 +89,13 @@ to records added since January 1, 2015.
 
     $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
 
+7. Harvest records from hatch3 in CMHF if the record meets our minimum qualifications for metadata sharing and is not
+restricted.
+
+.. code-block:: console
+
+    $ python run.py -e http://digi.countrymusichalloffame.org/oai/oai.php -m oai_qdc -w good -tr True -s hatch3
+
 ----------------------------------------------------
 Examples using the OAIChecker Class from dltnchecker
 ----------------------------------------------------

@@ -4,6 +4,7 @@ import json
 import xmltodict
 import os
 import time
+import hashlib
 
 
 class OAIChecker:
@@ -24,7 +25,7 @@ class OAIChecker:
         self.harvest = harvest
         self.which = which
         self.test_url = test_url
-        self.test_restricted=False
+        self.test_restricted = test_restricted
         self.endpoint = self.set_endpoint(endpoint, oai_set, prefix, oai_from, oai_until)
         self.__token = ""
         self.metadata_prefix = prefix
@@ -514,13 +515,20 @@ class RestrictionTester:
     def __init__(self, uri):
         self.is_good = self.__test(uri)
 
-    def __test(self, url):
+    @staticmethod
+    def __test(url):
+        """This private method checks to see if we can access an object and then compares the md5 checksum of its
+        thumbnail with the md5 sum of a bad thumbnail from Country Music Hall of Fame.
+        """
         good_codes = (200, 202)
-        r = requests.get(url)
-        if r.status_code in good_codes and "This item is restricted to only allow viewing of the metadata." in str(r.content):
-            return False
-        elif r.status_code in good_codes and "This item is restricted to only allow viewing of the metadata." not in str(r.content):
-            return True
+        r = requests.get(url.replace('digital', 'utils/getthumbnail'))
+        if r.status_code in good_codes:
+            hasher = hashlib.md5()
+            hasher.update(r.content)
+            if hasher.hexdigest() == '217206377fdc22b9ae48a08e819ec18f':
+                return False
+            else:
+                return True
         else:
             return False
 
