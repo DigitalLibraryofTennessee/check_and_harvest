@@ -259,7 +259,7 @@ class QDCTester:
                         if test_url.is_good is True:
                             has_a_uri = True
                     elif self.test_restricted is True:
-                        test_url = RestrictionTester(identifiers)
+                        test_url = ThumbnailTester(identifiers)
                         if test_url.is_good is True:
                             has_a_uri = True
                     else:
@@ -272,7 +272,7 @@ class QDCTester:
                             if test_url.is_good is True:
                                 has_a_uri = True
                         elif self.test_restricted is True:
-                            test_url = RestrictionTester(identifier)
+                            test_url = ThumbnailTester(identifier)
                             if test_url.is_good is True:
                                 has_a_uri = True
                         else:
@@ -510,15 +510,15 @@ class URLTester:
             return self.__test(url)
 
 
-class RestrictionTester:
-    """Class to test whether or not an object is restricted from view."""
+class ThumbnailTester:
+    """Class to test whether or not an object has a bad thumbnail."""
     def __init__(self, uri):
         self.is_good = self.__test(uri)
 
     @staticmethod
     def __test(url):
         """This private method checks to see if we can access an object and then compares the md5 checksum of its
-        thumbnail with the md5 sum of a bad thumbnail from Country Music Hall of Fame.
+        thumbnail with the md5 sum of a bad thumbnail from Country Music Hall of Fame or TSLA.
         """
         good_codes = (200, 202)
         bad_thumbnails = ('217206377fdc22b9ae48a08e819ec18f', 'e3e2234fa4fcfbbf1bdf1cd52b9a3524')
