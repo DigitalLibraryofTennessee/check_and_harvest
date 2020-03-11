@@ -521,7 +521,7 @@ class RestrictionTester:
         thumbnail with the md5 sum of a bad thumbnail from Country Music Hall of Fame.
         """
         good_codes = (200, 202)
-        bad_thumbnails = ('217206377fdc22b9ae48a08e819ec18f')
+        bad_thumbnails = ('217206377fdc22b9ae48a08e819ec18f', 'e3e2234fa4fcfbbf1bdf1cd52b9a3524')
         r = requests.get(url.replace('digital', 'utils/getthumbnail').replace('cdm/ref', 'utils/getthumbnail'))
         if r.status_code in good_codes:
             with open('thumbnails.log', 'a') as thumbnails_log:
