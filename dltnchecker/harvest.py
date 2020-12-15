@@ -206,10 +206,11 @@ class DCTester(MetadataTester):
     def __check_for_rights(self):
         try:
             for k, v in self.document[self.metadata_key].items():
-                if k == "dc:rights" or k == "dcterms:accessRights" and v.startswith("http"):
-                    return self.check_standard_rights(v)
-                elif k == "dc:rights" or k == "dcterms:accessRights":
-                    return True
+                if k == "dc:rights" or k == "dcterms:accessRights":
+                    if v.startswith('http'):
+                        return self.check_standard_rights(v)
+                    else:
+                        return True
             return False
         except KeyError:
             return False
