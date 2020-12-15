@@ -134,77 +134,6 @@ class OAIChecker:
         return
 
 
-class DCTester:
-    """A class to test DC records
-
-        Attributes:
-            metadata_key (str): The base node of the metadata rcord.
-            document (dict):  The DC record to be tested.
-            is_good (bool): Whether or not the document passed defined tests.
-        """
-    def __init__(self, metadata_format, document, test_urls=False):
-        self.test_url = test_urls
-        self.metadata_key = metadata_format
-        self.document = document
-        self.is_good = self.__test()
-
-    def __test(self):
-        tests = [
-            self.__check_for_title(),
-            self.__check_for_rights(),
-            self.__check_identifiers(),
-        ]
-        if False in tests:
-            return False
-        else:
-            return True
-
-    def __check_for_title(self):
-        try:
-            if self.document[self.metadata_key]["dc:title"]:
-                return True
-        except KeyError:
-            return False
-
-    def __check_for_rights(self):
-        try:
-            for k, v in self.document[self.metadata_key].items():
-                if k == "dc:rights":
-                    return True
-                elif k == "dcterms:accessRights":
-                    return True
-            return False
-        except KeyError:
-            return False
-
-    def __check_identifiers(self):
-        identifiers = self.document[self.metadata_key]["dc:identifier"]
-        try:
-            if type(identifiers) is str:
-                if identifiers.startswith("http"):
-                    if self.test_url is True:
-                        return URLTester(identifiers).is_good
-                    else:
-                        return True
-                else:
-                    return False
-            elif type(identifiers) is list:
-                good = False
-                for identifier in identifiers:
-                    if identifier.startswith("http"):
-                        if self.test_url is True:
-                            test_url = URLTester(identifier)
-                            if test_url.is_good is True:
-                                good = True
-                        else:
-                            good = True
-                return good
-            else:
-                return False
-        except KeyError:
-            return False
-
-
 class MetadataTester:
     def __init__(self, document):
         self.document = document
@@ -239,6 +168,77 @@ class MetadataTester:
         if rights_statement in rights_statements:
             return True
         else:
+            return False
+
+
+class DCTester(MetadataTester):
+    """A class to test DC records
+
+        Attributes:
+            metadata_key (str): The base node of the metadata rcord.
+            document (dict):  The DC record to be tested.
+            is_good (bool): Whether or not the document passed defined tests.
+        """
+    def __init__(self, metadata_format, document, test_urls=False):
+        self.test_url = test_urls
+        self.metadata_key = metadata_format
+        MetadataTester.__init__(self, document)
+        self.is_good = self.__test()
+
+    def __test(self):
+        tests = [
+            self.__check_for_title(),
+            self.__check_for_rights(),
+            self.__check_identifiers(),
+        ]
+        if False in tests:
+            return False
+        else:
+            return True
+
+    def __check_for_title(self):
+        try:
+            if self.document[self.metadata_key]["dc:title"]:
+                return True
+        except KeyError:
+            return False
+
+    def __check_for_rights(self):
+        try:
+            for k, v in self.document[self.metadata_key].items():
+                if k == "dc:rights" or k == "dcterms:accessRights" and v.startswith("http"):
+                    return self.check_standard_rights(v)
+                elif k == "dc:rights" or k == "dcterms:accessRights":
+                    return True
+            return False
+        except KeyError:
+            return False
+
+    def __check_identifiers(self):
+        identifiers = self.document[self.metadata_key]["dc:identifier"]
+        try:
+            if type(identifiers) is str:
+                if identifiers.startswith("http"):
+                    if self.test_url is True:
+                        return URLTester(identifiers).is_good
+                    else:
+                        return True
+                else:
+                    return False
+            elif type(identifiers) is list:
+                good = False
+                for identifier in identifiers:
+                    if identifier.startswith("http"):
+                        if self.test_url is True:
+                            test_url = URLTester(identifier)
+                            if test_url.is_good is True:
+                                good = True
+                        else:
+                            good = True
+                return good
+            else:
+                return False
+        except KeyError:
             return False
 
 
