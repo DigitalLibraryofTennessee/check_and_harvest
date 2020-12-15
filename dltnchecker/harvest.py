@@ -430,6 +430,38 @@ class MODSTester:
             pass
         return has_record_content_source
 
+    @staticmethod
+    def __check_standard_rights(rights_statement):
+        rights_statements = ('http://rightsstatements.org/vocab/InC/1.0/',
+                             'http://rightsstatements.org/vocab/InC-OW-EU/1.0/',
+                             'http://rightsstatements.org/vocab/InC-EDU/1.0/',
+                             'http://rightsstatements.org/vocab/InC-NC/1.0/',
+                             'http://rightsstatements.org/vocab/InC-RUU/1.0/',
+                             'http://rightsstatements.org/vocab/NoC-CR/1.0/',
+                             'http://rightsstatements.org/vocab/NoC-NC/1.0/',
+                             'http://rightsstatements.org/vocab/NoC-OKLR/1.0/',
+                             'http://rightsstatements.org/vocab/NoC-US/1.0/',
+                             'http://rightsstatements.org/vocab/CNE/1.0/',
+                             'http://rightsstatements.org/vocab/UND/1.0/',
+                             'http://rightsstatements.org/vocab/NKC/1.0/',
+                             'https://creativecommons.org/licenses/by/4.0/',
+                             'https://creativecommons.org/licenses/by-sa/4.0/',
+                             'https://creativecommons.org/licenses/by-nc/4.0/',
+                             'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+                             'https://creativecommons.org/licenses/by-nd/4.0/',
+                             'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+                             'https://creativecommons.org/licenses/by/3.0/',
+                             'https://creativecommons.org/licenses/by-sa/3.0/',
+                             'https://creativecommons.org/licenses/by-nc/3.0/',
+                             'https://creativecommons.org/licenses/by-nc-sa/3.0/',
+                             'https://creativecommons.org/licenses/by-nd/3.0/',
+                             'https://creativecommons.org/licenses/by-nc-nd/3.0/',
+                             'https://creativecommons.org/publicdomain/zero/1.0/')
+        if rights_statement in rights_statements:
+            return True
+        else:
+            return False
+
     def __check_rights(self):
         has_rights = False
         try:
@@ -437,14 +469,14 @@ class MODSTester:
                 access_condition = self.document['mods']['accessCondition']
                 if '@type' in access_condition:
                     if access_condition['@type'] == 'use and reproduction' and '@xlink:href' in access_condition:
-                        has_rights = True
+                        has_rights = self.__check_standard_rights(access_condition['@xlink:href'])
                     elif access_condition['@type'] == 'local rights statement':
                         has_rights = True
                 elif type(access_condition) is list:
                     for rights in access_condition:
                         if '@type' in rights:
                             if rights['@type'] == 'use and reproduction' and '@xlink:href' in rights:
-                                has_rights = True
+                                has_rights = self.__check_standard_rights(access_condition['@xlink:href'])
                             elif rights['@type'] == 'local rights statement':
                                 has_rights = True
         except KeyError:
