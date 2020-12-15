@@ -242,7 +242,7 @@ class MetadataTester:
             return False
 
 
-class QDCTester:
+class QDCTester(MetadataTester):
     """A class to test qdc records
 
     """
@@ -250,7 +250,7 @@ class QDCTester:
         self.metadata_key = metadata_key
         self.test_url = test_urls
         self.test_restricted = test_restricted
-        self.document = document
+        MetadataTester.__init__(self, document)
         self.is_good = self.__test()
 
     def __test(self):
@@ -277,10 +277,17 @@ class QDCTester:
         has_rights = False
         try:
             for k, v in self.document[self.metadata_key].items():
-                if k == "dc:rights":
+                if k == "dc:rights" and v.startswith("http"):
+                    has_rights = self.check_standard_rights(v)
+                elif k == 'dc:rights':
                     has_rights = True
+                elif k == "dcterms:accessRights" and v.startswith('http'):
+                    has_rights = self.check_standard_rights(v)
                 elif k == "dcterms:accessRights":
                     has_rights = True
+                elif k == "dcterms:license" and v.startswith("http"):
+                    has_rights = self.check_standard_rights(v)
+                    break
         except KeyError:
             pass
         return has_rights
