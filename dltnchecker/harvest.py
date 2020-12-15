@@ -328,7 +328,7 @@ class QDCTester(MetadataTester):
         return has_a_uri
 
 
-class XOAITester:
+class XOAITester(MetadataTester):
     """A class to run tests of xoai records.
 
     Attributes:
@@ -337,7 +337,7 @@ class XOAITester:
     """
     def __init__(self, document, test_urls=False):
         self.test_urls = test_urls
-        self.document = document
+        MetadataTester.__init__(self, document)
         self.is_good = self.__test()
 
     def __test(self):
