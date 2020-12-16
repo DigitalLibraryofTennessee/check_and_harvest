@@ -164,7 +164,8 @@ class MetadataTester:
                              'https://creativecommons.org/licenses/by-nc-sa/3.0/',
                              'https://creativecommons.org/licenses/by-nd/3.0/',
                              'https://creativecommons.org/licenses/by-nc-nd/3.0/',
-                             'https://creativecommons.org/publicdomain/zero/1.0/')
+                             'https://creativecommons.org/publicdomain/zero/1.0/',
+                             'https://creativecommons.org/publicdomain/mark/1.0/')
         if rights_statement in rights_statements:
             return True
         else:
