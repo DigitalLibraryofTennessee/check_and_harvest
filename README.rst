@@ -27,10 +27,10 @@ If you want to do it this way, you're going to need to clone this.  It's also su
 
 .. code-block:: console
 
-    $ git clone https://github.com/DigitalLibraryofTennessee/check_and_harvest
-    $ cd check_and_harvest
-    $ pipenv install
-    $ pipenv shell
+    git clone https://github.com/DigitalLibraryofTennessee/check_and_harvest
+    cd check_and_harvest
+    pipenv install
+    pipenv shell
 
 Using OAIChecker from the dltnchecker module
 ============================================
@@ -39,13 +39,13 @@ If you're cool :sunglasses: :
 
 .. code-block:: console
 
-    $ pipenv install dltn_checker
+    pipenv install dltn_checker
 
 Otherwise:
 
 .. code-block:: console
 
-    $ pip install dltn_checker
+    pip install dltn_checker
 
 
 ------------------------------------------
@@ -56,45 +56,45 @@ Examples with the Built In Argument Parser
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc
 
 2. Check and harvest good DC records from an entire OAI-PMH feed.
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc -H True
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m oai_dc -H True
 
 3. Check and harvest good xoai records from a specific set.
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m xoai -s my_awesome_xoai_set -H True
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m xoai -s my_awesome_xoai_set -H True
 
 4. Check and harvest good MODS records from an entire provider in Repox.
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True
 
 5. Check and harvest good MODS records from a provider and ensure that the thumbnail and link to the objects resolve.
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True
 
 6. Check and harvest good MODS records from a provider, ensure that the thumbnail and link to object are good, and limit
 to records added since January 1, 2015.
 
 .. code-block:: console
 
-    $ python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
+    python run.py -e http://my-oai-endpoint:8080/OAIHandler -m MODS -p CrossroadstoFreedomr0 -H True -tu True -f 2015-01-01
 
 7. Harvest records from hatch3 in CMHF if the record meets our minimum qualifications for metadata sharing and is not
 restricted.
 
 .. code-block:: console
 
-    $ python run.py -e http://digi.countrymusichalloffame.org/oai/oai.php -m oai_qdc -w good -tr True -s hatch3
+    python run.py -e http://digi.countrymusichalloffame.org/oai/oai.php -m oai_qdc -w good -tr True -s hatch3
 
 ----------------------------------------------------
 Examples using the OAIChecker Class from dltnchecker
